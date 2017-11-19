@@ -1,0 +1,31 @@
+{
+    "console": {
+        "enable": true,
+        "level": "FINE"
+    },
+    "files": [{
+        "enable": true,
+        "level": "DEBUG",
+        "filename":"./test.log",
+        "category": "Test",
+        "pattern": "[%D %T] [%C] [%L] (%S) %M"
+    },{
+        "enable": false,
+        "level": "DEBUG",
+        "filename":"rotate_test.log",
+        "category": "TestRotate",
+        "pattern": "[%D %T] [%C] [%L] (%S) %M",
+        "rotate": true,
+        "maxsize": "500M",
+        "maxlines": "10K",
+        "daily": true
+    }],
+    "sockets": [{
+        "enable": false,
+        "level": "DEBUG",
+        "category": "TestSocket",
+        "pattern": "[%D %T] [%C] [%L] (%S) %M",
+        "addr": "127.0.0.1:12124",
+        "protocol":"udp"
+    }]
+}
