@@ -3,9 +3,9 @@ package log4go
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/toolkits/file"
 	"os"
 	"strings"
-	"toolkits/file"
 )
 
 type ConsoleConfig struct {
@@ -60,7 +60,7 @@ type LogConfig struct {
 func (log Logger) LoadJsonConfiguration(filename string) {
 	log.Close()
 
-	content, err := file.ReadFile(filename)
+	content, err := ReadFile(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
 		os.Exit(1)
@@ -208,4 +208,21 @@ func jsonToSocketLogWriter(filename string, sf *SocketConfig) (SocketLogWriter, 
 	}
 
 	return NewSocketLogWriter(protocol, endpoint), true
+}
+
+func ReadFile(path string) (string, error) {
+	if path == "" {
+		return "", fmt.Errorf("[%s] path empty", path)
+	}
+
+	if !file.IsExist(path) {
+		return "", fmt.Errorf("config file %s is nonexistent", path)
+	}
+
+	configContent, err := file.ToTrimString(path)
+	if err != nil {
+		return "", fmt.Errorf("read file %s fail %s", path, err)
+	}
+
+	return configContent, nil
 }

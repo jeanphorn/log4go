@@ -10,8 +10,10 @@ Two new features are supported, one is Json config style, and the other is defer
 
 -   **Log to console**
 -   **Log to file, support rotate by size or time**
--   **log to network, support tcp and udp **
+-   **log to network, support tcp and udp**
 -   **support xml config**
+
+---------------------------
 
 -   **Support Json style configuration**
 -   **Add Category for log**
@@ -45,7 +47,7 @@ Here it is a Json config example:
         "enable": true,
         "level": "DEBUG",
         "filename":"./test.log",
-        "category": "Test",							// different category log to different files
+        "category": "Test",			// different category log to different files
         "pattern": "[%D %T] [%C] [%L] (%S) %M"		// log output formmat
     },{ 
         "enable": false,
@@ -105,11 +107,11 @@ func main() {
 
 The output like:
 
-> [2017/11/15 14:35:11 CST] [Test] [INFO] (main.main:15) category Test info test ... 
-> [2017/11/15 14:35:11 CST] [Test] [INFO] (main.main:16) category Test info test message: new test msg 
-> [2017/11/15 14:35:11 CST] [Test] [DEBG] (main.main:17) category Test debug test ... 
-> [2017/11/15 14:35:11 CST] [DEFAULT] [INFO] (main.main:26) nomal info test ... 
-> [2017/11/15 14:35:11 CST] [DEFAULT] [DEBG] (main.main:27) nomal debug test ...
+> [2017/11/15 14:35:11 CST] [Test] [INFO] (main.main:15) category Test info test ...     
+> [2017/11/15 14:35:11 CST] [Test] [INFO] (main.main:16) category Test info test message: new test msg     
+> [2017/11/15 14:35:11 CST] [Test] [DEBG] (main.main:17) category Test debug test ...     
+> [2017/11/15 14:35:11 CST] [DEFAULT] [INFO] (main.main:26) nomal info test ...     
+> [2017/11/15 14:35:11 CST] [DEFAULT] [DEBG] (main.main:27) nomal debug test ...    
 
 
 ## Thanks
