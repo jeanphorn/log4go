@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 )
 
@@ -58,10 +59,12 @@ func FormatLogRecord(format string, rec *LogRecord) string {
 		}
 		cache = *updated
 		formatCache = updated
-	}
 
+	}
+	//custom format datetime pattern %D{2006-01-02T15:04:05}
+	formatByte := changeDttmFormat(format, rec)
 	// Split the string into pieces by % signs
-	pieces := bytes.Split([]byte(format), []byte{'%'})
+	pieces := bytes.Split(formatByte, []byte{'%'})
 
 	// Iterate over the pieces, replacing known formats
 	for i, piece := range pieces {
@@ -128,4 +131,22 @@ func (w FormatLogWriter) LogWrite(rec *LogRecord) {
 // send log messages to this logger after a Close have undefined behavior.
 func (w FormatLogWriter) Close() {
 	close(w)
+}
+
+func changeDttmFormat(format string, rec *LogRecord) []byte {
+	formatByte := []byte(format)
+	r := regexp.MustCompile("\\%D\\{(.*?)\\}")
+	i := 0
+	formatByte = r.ReplaceAllFunc(formatByte, func(s []byte) []byte {
+		if i < 2 {
+			i++
+			str := string(s)
+			str = strings.Replace(str, "%D", "", -1)
+			str = strings.Replace(str, "{", "", -1)
+			str = strings.Replace(str, "}", "", -1)
+			return []byte(rec.Created.Format(str))
+		}
+		return s
+	})
+	return formatByte
 }

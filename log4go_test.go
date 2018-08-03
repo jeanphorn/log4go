@@ -76,6 +76,38 @@ func TestFormatLogRecord(t *testing.T) {
 	}
 }
 
+var formatTestsDttmPattern = []struct {
+	Test    string
+	Record  *LogRecord
+	Formats map[string]string
+}{
+	{
+		Test: "Standard formats",
+		Record: &LogRecord{
+			Level:   ERROR,
+			Source:  "source",
+			Message: "message",
+			Created: now,
+		},
+		Formats: map[string]string{
+			"[%D{2006-01-02T15:04:05}] [%L] (%S) %M": "[2009-02-13T23:31:30] [EROR] (source) message\n",
+		},
+	},
+}
+
+func TestFormatDttmPatternLogRecord(t *testing.T) {
+	for _, test := range formatTestsDttmPattern {
+		name := test.Test
+		for fmt, want := range test.Formats {
+			if got := FormatLogRecord(fmt, test.Record); got != want {
+				t.Errorf("%s - %s:", name, fmt)
+				t.Errorf("   got %q", got)
+				t.Errorf("  want %q", want)
+			}
+		}
+	}
+}
+
 var logRecordWriteTests = []struct {
 	Test    string
 	Record  *LogRecord
