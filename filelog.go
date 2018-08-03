@@ -59,16 +59,16 @@ func (w *FileLogWriter) Close() {
 //
 // The standard log-line format is:
 //   [%D %T] [%L] (%S) %M
-func NewFileLogWriter(fname string, rotate bool) *FileLogWriter {
+func NewFileLogWriter(fname string, rotate bool, daily bool) *FileLogWriter {
 	w := &FileLogWriter{
 		rec:       make(chan *LogRecord, LogBufferLength),
 		rot:       make(chan bool),
 		filename:  fname,
 		format:    "[%D %T] [%L] (%S) %M",
+		daily:     daily,
 		rotate:    rotate,
 		maxbackup: 999,
 	}
-
 	// open the file for the first time
 	if err := w.intRotate(); err != nil {
 		fmt.Fprintf(os.Stderr, "FileLogWriter(%q): %s\n", w.filename, err)
@@ -133,26 +133,34 @@ func (w *FileLogWriter) intRotate() error {
 		fmt.Fprint(w.file, FormatLogRecord(w.trailer, &LogRecord{Created: time.Now()}))
 		w.file.Close()
 	}
-
 	// If we are keeping log files, move it to the next available number
 	if w.rotate {
-		_, err := os.Lstat(w.filename)
+		info, err := os.Stat(w.filename)
+		// _, err = os.Lstat(w.filename)
+
 		if err == nil { // file exists
 			// Find the next available number
+			modifiedtime := info.ModTime()
+			w.daily_opendate = modifiedtime.Day()
 			num := 1
 			fname := ""
 			if w.daily && time.Now().Day() != w.daily_opendate {
-				yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
-
-				for ; err == nil && num <= w.maxbackup; num++ {
-					fname = w.filename + fmt.Sprintf(".%s.%03d", yesterday, num)
-					_, err = os.Lstat(fname)
+				modifieddate := modifiedtime.Format("2006-01-02")
+				// for ; err == nil && num <= w.maxbackup; num++ {
+				// 	fname = w.filename + fmt.Sprintf(".%s.%03d", yesterday, num)
+				// 	_, err = os.Lstat(fname)
+				// }
+				// if err == nil {
+				// 	return fmt.Errorf("Rotate: Cannot find free log number to rename %s\n", w.filename)
+				// }
+				fname = w.filename + fmt.Sprintf(".%s", modifieddate)
+				w.file.Close()
+				// Rename the file to its newfound home
+				err = os.Rename(w.filename, fname)
+				if err != nil {
+					return fmt.Errorf("Rotate: %s\n", err)
 				}
-				// return error if the last file checked still existed
-				if err == nil {
-					return fmt.Errorf("Rotate: Cannot find free log number to rename %s\n", w.filename)
-				}
-			} else {
+			} else if !w.daily {
 				num = w.maxbackup - 1
 				for ; num >= 1; num-- {
 					fname = w.filename + fmt.Sprintf(".%d", num)
@@ -162,14 +170,15 @@ func (w *FileLogWriter) intRotate() error {
 						os.Rename(fname, nfname)
 					}
 				}
+				w.file.Close()
+				// Rename the file to its newfound home
+				err = os.Rename(w.filename, fname)
+				// return error if the last file checked still existed
+				if err != nil {
+					return fmt.Errorf("Rotate: %s\n", err)
+				}
 			}
 
-			w.file.Close()
-			// Rename the file to its newfound home
-			err = os.Rename(w.filename, fname)
-			if err != nil {
-				return fmt.Errorf("Rotate: %s\n", err)
-			}
 		}
 	}
 
@@ -254,8 +263,8 @@ func (w *FileLogWriter) SetRotate(rotate bool) *FileLogWriter {
 
 // NewXMLLogWriter is a utility method for creating a FileLogWriter set up to
 // output XML record log messages instead of line-based ones.
-func NewXMLLogWriter(fname string, rotate bool) *FileLogWriter {
-	return NewFileLogWriter(fname, rotate).SetFormat(
+func NewXMLLogWriter(fname string, rotate bool, daily bool) *FileLogWriter {
+	return NewFileLogWriter(fname, rotate, daily).SetFormat(
 		`	<record level="%L">
 		<timestamp>%D %T</timestamp>
 		<source>%S</source>

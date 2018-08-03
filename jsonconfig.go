@@ -3,9 +3,10 @@ package log4go
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/toolkits/file"
 	"os"
 	"strings"
+
+	"github.com/toolkits/file"
 )
 
 type ConsoleConfig struct {
@@ -176,11 +177,10 @@ func jsonToFileLogWriter(filename string, ff *FileConfig) (*FileLogWriter, bool)
 		return nil, true
 	}
 
-	flw := NewFileLogWriter(file, rotate)
+	flw := NewFileLogWriter(file, rotate, daily)
 	flw.SetFormat(format)
 	flw.SetRotateLines(maxlines)
 	flw.SetRotateSize(maxsize)
-	flw.SetRotateDaily(daily)
 	return flw, true
 }
 
