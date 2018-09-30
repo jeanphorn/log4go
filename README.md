@@ -19,6 +19,7 @@ Two new features are supported, one is Json config style, and the other is defer
 -   **Add Category for log**
     * Classify your logs for different output and different usage.
 -   **Compatible with the old**
+-   **Support json style config content beside filename**
 
 ## Usage
 
