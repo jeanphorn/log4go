@@ -61,13 +61,22 @@ type LogConfig struct {
 func (log Logger) LoadJsonConfiguration(filename string) {
 	log.Close()
 
-	content, err := ReadFile(filename)
+	var (
+		lc      LogConfig
+		content string
+	)
+	err := json.Compact(dst, []byte(filename))
+
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
-		os.Exit(1)
+		content, err = file.ReadFile(filename)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
+			os.Exit(1)
+		}
+	} else {
+		content = string(dst.Bytes())
 	}
 
-	var lc LogConfig
 	err = json.Unmarshal([]byte(content), &lc)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not parse json configuration in %q: %s\n", filename, err)
