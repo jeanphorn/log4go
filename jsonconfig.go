@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
+        "bytes"
 	"github.com/toolkits/file"
 )
 
@@ -60,19 +60,16 @@ type LogConfig struct {
 // see examples/example.json for ducumentation
 func (log Logger) LoadJsonConfiguration(filename string) {
 	log.Close()
-
+        dst := new(bytes.Buffer)
 	var (
 		lc      LogConfig
 		content string
 	)
 	err := json.Compact(dst, []byte(filename))
 
-	if err != nil {
-		content, err = file.ReadFile(filename)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
-			os.Exit(1)
-		}
+	if err != nil {		
+		fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
+		os.Exit(1)
 	} else {
 		content = string(dst.Bytes())
 	}
