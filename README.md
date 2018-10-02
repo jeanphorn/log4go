@@ -4,7 +4,7 @@
 
 This repository is reconstructed from alecthomas's log4go, which is a logging package similar to log4j for the Go programming language.
 
-Two new features are supported, one is Json config style, and the other is deferent output accordding to category.
+Two new features are supported: one is Json config style, and the other is different output according to category.
 
 ## Features
 
@@ -27,7 +27,7 @@ First, get the code from this repo.
 
 ```go get github.com/jeanphorn/log4go```
 
-Then import it to you project.
+Then import it to your project.
 
 ```import log "github.com/jeanphorn/log4go"```
 
@@ -36,7 +36,7 @@ Then import it to you project.
 
 The config file is optional, if you don't set the config file, it would use the default console config.
 
-Here it is a Json config example:
+Here is a Json config example:
 
 ```
 {
@@ -49,14 +49,14 @@ Here it is a Json config example:
         "level": "DEBUG",
         "filename":"./test.log",
         "category": "Test",			// different category log to different files
-        "pattern": "[%D %T] [%C] [%L] (%S) %M"		// log output formmat
+        "pattern": "[%D %T] [%C] [%L] (%S) %M"	// log output formmat
     },{ 
         "enable": false,
         "level": "DEBUG",
         "filename":"rotate_test.log",
         "category": "TestRotate",
         "pattern": "[%D %T] [%C] [%L] (%S) %M",
-        "rotate": true,								// wether rotate the log
+        "rotate": true,				// whether rotate the log
         "maxsize": "500M",
         "maxlines": "10K",
         "daily": true
@@ -98,8 +98,8 @@ func main() {
 	log.LOGGER("TestSocket").Debug("category TestSocket debug test ...")
 
 	// original log4go test
-	log.Info("nomal info test ...")
-	log.Debug("nomal debug test ...")
+	log.Info("normal info test ...")
+	log.Debug("normal debug test ...")
 
 	log.Close()
 }
@@ -111,8 +111,8 @@ The output like:
 > [2017/11/15 14:35:11 CST] [Test] [INFO] (main.main:15) category Test info test ...     
 > [2017/11/15 14:35:11 CST] [Test] [INFO] (main.main:16) category Test info test message: new test msg     
 > [2017/11/15 14:35:11 CST] [Test] [DEBG] (main.main:17) category Test debug test ...     
-> [2017/11/15 14:35:11 CST] [DEFAULT] [INFO] (main.main:26) nomal info test ...     
-> [2017/11/15 14:35:11 CST] [DEFAULT] [DEBG] (main.main:27) nomal debug test ...    
+> [2017/11/15 14:35:11 CST] [DEFAULT] [INFO] (main.main:26) normal info test ...     
+> [2017/11/15 14:35:11 CST] [DEFAULT] [DEBG] (main.main:27) normal debug test ...    
 
 
 ## Thanks
