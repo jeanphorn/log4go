@@ -68,8 +68,11 @@ func (log Logger) LoadJsonConfiguration(filename string) {
 	err := json.Compact(dst, []byte(filename))
 
 	if err != nil {		
-		fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
-		os.Exit(1)
+		content, err = file.ReadFile(filename)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "LoadJsonConfiguration: Error: Could not read %q: %s\n", filename, err)
+			os.Exit(1)
+		}
 	} else {
 		content = string(dst.Bytes())
 	}
