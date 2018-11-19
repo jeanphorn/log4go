@@ -59,7 +59,8 @@ Here is a Json config example:
         "rotate": true,				// whether rotate the log
         "maxsize": "500M",
         "maxlines": "10K",
-        "daily": true
+        "daily": true,
+        "sanitize": true
     }], 
     "sockets": [{
         "enable": false,
