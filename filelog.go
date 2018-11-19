@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"strings"
 )
 
 // This log writer sends output to a file
@@ -38,6 +39,9 @@ type FileLogWriter struct {
 	// Keep old logfiles (.001, .002, etc)
 	rotate    bool
 	maxbackup int
+
+	// Sanitize newlines to prevent log injection
+	sanitize	bool
 }
 
 // This is the FileLogWriter's output method
@@ -68,6 +72,7 @@ func NewFileLogWriter(fname string, rotate bool, daily bool) *FileLogWriter {
 		daily:     daily,
 		rotate:    rotate,
 		maxbackup: 999,
+		sanitize:  false, // set to false so as not to break compatibility
 	}
 	// open the file for the first time
 	if err := w.intRotate(); err != nil {
@@ -102,6 +107,11 @@ func NewFileLogWriter(fname string, rotate bool, daily bool) *FileLogWriter {
 						fmt.Fprintf(os.Stderr, "FileLogWriter(%q): %s\n", w.filename, err)
 						return
 					}
+				}
+
+				// Sanitize newlines
+				if w.sanitize {
+					rec.Message = strings.Replace(rec.Message, "\n", "\\n", -1)
 				}
 
 				// Perform the write
@@ -258,6 +268,15 @@ func (w *FileLogWriter) SetRotateMaxBackup(maxbackup int) *FileLogWriter {
 func (w *FileLogWriter) SetRotate(rotate bool) *FileLogWriter {
 	//fmt.Fprintf(os.Stderr, "FileLogWriter.SetRotate: %v\n", rotate)
 	w.rotate = rotate
+	return w
+}
+
+// SetSanitize changes whether or not the sanitization of newline characters takes
+// place. This is to prevent log injection, although at some point the sanitization
+// of other non-printable characters might be valueable just to prevent binary
+// data from mucking up the logs.
+func (w *FileLogWriter) SetSanitize(sanitize bool) *FileLogWriter {
+	w.sanitize = sanitize
 	return w
 }
 

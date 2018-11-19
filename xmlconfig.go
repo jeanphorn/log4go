@@ -182,6 +182,7 @@ func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*Fi
 	maxsize := 0
 	daily := false
 	rotate := false
+	sanitize := false
 
 	// Parse properties
 	for _, prop := range props {
@@ -198,6 +199,8 @@ func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*Fi
 			daily = strings.Trim(prop.Value, " \r\n") != "false"
 		case "rotate":
 			rotate = strings.Trim(prop.Value, " \r\n") != "false"
+		case "sanitize":
+			sanitize = strings.Trim(prop.Value, " \r\n") != "false"
 		default:
 			fmt.Fprintf(os.Stderr, "LoadConfiguration: Warning: Unknown property \"%s\" for file filter in %s\n", prop.Name, filename)
 		}
@@ -218,6 +221,7 @@ func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*Fi
 	flw.SetFormat(format)
 	flw.SetRotateLines(maxlines)
 	flw.SetRotateSize(maxsize)
+	flw.SetSanitize(sanitize)
 	return flw, true
 }
 
