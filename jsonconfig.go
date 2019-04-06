@@ -14,6 +14,7 @@ type ConsoleConfig struct {
 	Enable  bool   `json:"enable"`
 	Level   string `json:"level"`
 	Pattern string `json:"pattern"`
+	Stderr  bool   `json:"stderr"`
 }
 
 type FileConfig struct {
@@ -38,7 +39,7 @@ type FileConfig struct {
 	Maxsize  string `json:"maxsize"`  // \d+[KMG]? Suffixes are in terms of 2**10
 	Maxlines string `json:"maxlines"` //\d+[KMG]? Suffixes are in terms of thousands
 	Daily    bool   `json:"daily"`    //Automatically rotates by day
-	Sanitize bool	`json:"sanitize"` //Sanitize newlines to prevent log injection
+	Sanitize bool   `json:"sanitize"` //Sanitize newlines to prevent log injection
 }
 
 type SocketConfig struct {
@@ -155,7 +156,7 @@ func jsonToConsoleLogWriter(filename string, cf *ConsoleConfig) (*ConsoleLogWrit
 		return nil, true
 	}
 
-	clw := NewConsoleLogWriter()
+	clw := NewConsoleLogWriter(cf.Stderr)
 	clw.SetFormat(format)
 
 	return clw, true

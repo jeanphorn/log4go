@@ -150,7 +150,7 @@ func xmlToConsoleLogWriter(filename string, props []xmlProperty, enabled bool) (
 		return nil, true
 	}
 
-	clw := NewConsoleLogWriter()
+	clw := NewConsoleLogWriter(false)
 	clw.SetFormat(format)
 
 	return clw, true
