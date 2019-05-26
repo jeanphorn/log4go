@@ -11,8 +11,7 @@ import (
 func LOGGER(category string) *Filter {
 	f, ok := Global[category]
 	if !ok {
-		f = Global["stdout"]
-		f.Category = "DEFAULT"
+		f = &Filter{CRITICAL, NewConsoleLogWriter(), "DEFAULT"}  
 	} else {
 		f.Category = category
 	}
@@ -62,7 +61,7 @@ func (f *Filter) intLogf(lvl Level, format string, args ...interface{}) {
 	*/
 	default_filter := Global["stdout"]
 
-	if lvl > default_filter.Level {
+	if default_filter != nil && lvl > default_filter.Level {
 		default_filter.LogWrite(rec)
 	}
 
@@ -102,7 +101,7 @@ func (f *Filter) intLogc(lvl Level, closure func() string) {
 
 	default_filter := Global["stdout"]
 
-	if lvl > default_filter.Level {
+	if default_filter != nil &&  lvl > default_filter.Level {
 		default_filter.LogWrite(rec)
 	}
 
@@ -134,7 +133,7 @@ func (f *Filter) Log(lvl Level, source, message string) {
 
 	default_filter := Global["stdout"]
 
-	if lvl > default_filter.Level {
+	if default_filter != nil && lvl > default_filter.Level {
 		default_filter.LogWrite(rec)
 	}
 
