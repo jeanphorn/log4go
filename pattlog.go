@@ -116,6 +116,7 @@ func NewFormatLogWriter(out io.Writer, format string) FormatLogWriter {
 }
 
 func (w FormatLogWriter) run(out io.Writer, format string) {
+	defer recoverPanic()
 	for rec := range w {
 		fmt.Fprint(out, FormatLogRecord(format, rec))
 	}

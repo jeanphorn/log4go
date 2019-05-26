@@ -81,6 +81,7 @@ func NewFileLogWriter(fname string, rotate bool, daily bool) *FileLogWriter {
 	}
 
 	go func() {
+		defer recoverPanic()
 		defer func() {
 			if w.file != nil {
 				fmt.Fprint(w.file, FormatLogRecord(w.trailer, &LogRecord{Created: time.Now()}))
