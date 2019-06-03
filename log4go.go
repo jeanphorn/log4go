@@ -149,7 +149,7 @@ func NewLogger() Logger {
 func NewConsoleLogger(lvl Level) Logger {
 	os.Stderr.WriteString("warning: use of deprecated NewConsoleLogger\n")
 	return Logger{
-		"stdout": &Filter{lvl, NewConsoleLogWriter(), "DEFAULT"},
+		"stdout": &Filter{lvl, NewConsoleLogWriter(false), "DEFAULT"},
 	}
 }
 
@@ -157,7 +157,7 @@ func NewConsoleLogger(lvl Level) Logger {
 // or above lvl to standard output.
 func NewDefaultLogger(lvl Level) Logger {
 	return Logger{
-		"stdout": &Filter{lvl, NewConsoleLogWriter(), "DEFAULT"},
+		"stdout": &Filter{lvl, NewConsoleLogWriter(false), "DEFAULT"},
 	}
 }
 

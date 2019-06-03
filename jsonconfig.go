@@ -14,6 +14,7 @@ type ConsoleConfig struct {
 	Enable  bool   `json:"enable"`
 	Level   string `json:"level"`
 	Pattern string `json:"pattern"`
+	Stderr  bool   `json:"stderr"`
 }
 
 type FileConfig struct {
@@ -155,7 +156,7 @@ func jsonToConsoleLogWriter(filename string, cf *ConsoleConfig) (*ConsoleLogWrit
 		return nil, true
 	}
 
-	clw := NewConsoleLogWriter()
+	clw := NewConsoleLogWriter(cf.Stderr)
 	clw.SetFormat(format)
 
 	return clw, true
