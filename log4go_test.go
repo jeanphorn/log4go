@@ -126,7 +126,10 @@ var logRecordWriteTests = []struct {
 }
 
 func TestConsoleLogWriter(t *testing.T) {
-	console := new(ConsoleLogWriter)
+	console := &ConsoleLogWriter{
+		format: "[%T %D] [%L] %M",
+		w:      make(chan *LogRecord, LogBufferLength),
+	}
 
 	r, w := io.Pipe()
 	go console.run(w)
@@ -153,7 +156,7 @@ func TestFileLogWriter(t *testing.T) {
 	}(LogBufferLength)
 	LogBufferLength = 0
 
-	w := NewFileLogWriter(testLogFile, false)
+	w := NewFileLogWriter(testLogFile, false, false)
 	if w == nil {
 		t.Fatalf("Invalid return: w should not be nil")
 	}
@@ -176,7 +179,7 @@ func TestXMLLogWriter(t *testing.T) {
 	}(LogBufferLength)
 	LogBufferLength = 0
 
-	w := NewXMLLogWriter(testLogFile, false)
+	w := NewXMLLogWriter(testLogFile, false, false)
 	if w == nil {
 		t.Fatalf("Invalid return: w should not be nil")
 	}
@@ -210,7 +213,7 @@ func TestLogger(t *testing.T) {
 
 	//func (l *Logger) AddFilter(name string, level int, writer LogWriter) {}
 	l := make(Logger)
-	l.AddFilter("stdout", DEBUG, NewConsoleLogWriter())
+	l.AddFilter("stdout", DEBUG, NewConsoleLogWriter(false))
 	if lw, exist := l["stdout"]; lw == nil || exist != true {
 		t.Fatalf("AddFilter produced invalid logger (DNE or nil)")
 	}
@@ -261,7 +264,7 @@ func TestLogOutput(t *testing.T) {
 	l := make(Logger)
 
 	// Delete and open the output log without a timestamp (for a constant md5sum)
-	l.AddFilter("file", FINEST, NewFileLogWriter(testLogFile, false).SetFormat("[%L] %M"))
+	l.AddFilter("file", FINEST, NewFileLogWriter(testLogFile, false, false).SetFormat("[%L] %M"))
 	defer os.Remove(testLogFile)
 
 	// Send some log messages
@@ -356,17 +359,17 @@ func TestXMLConfig(t *testing.T) {
 	fmt.Fprintln(fd, "    <level>FINEST</level>")
 	fmt.Fprintln(fd, "    <property name=\"filename\">test.log</property>")
 	fmt.Fprintln(fd, "    <!--")
-	fmt.Fprintln(fd, "       %T - Time (15:04:05 MST)")
-	fmt.Fprintln(fd, "       %t - Time (15:04)")
-	fmt.Fprintln(fd, "       %D - Date (2006/01/02)")
-	fmt.Fprintln(fd, "       %d - Date (01/02/06)")
-	fmt.Fprintln(fd, "       %L - Level (FNST, FINE, DEBG, TRAC, WARN, EROR, CRIT)")
-	fmt.Fprintln(fd, "       %S - Source")
-	fmt.Fprintln(fd, "       %M - Message")
+	fmt.Fprintf(fd, "       %%T - Time (15:04:05 MST)\n")
+	fmt.Fprintf(fd, "       %%t - Time (15:04)\n")
+	fmt.Fprintf(fd, "       %%D - Date (2006/01/02)\n")
+	fmt.Fprintf(fd, "       %%d - Date (01/02/06)\n")
+	fmt.Fprintf(fd, "       %%L - Level (FNST, FINE, DEBG, TRAC, WARN, EROR, CRIT)\n")
+	fmt.Fprintf(fd, "       %%S - Source\n")
+	fmt.Fprintf(fd, "       %%M - Message\n")
 	fmt.Fprintln(fd, "       It ignores unknown format strings (and removes them)")
-	fmt.Fprintln(fd, "       Recommended: \"[%D %T] [%L] (%S) %M\"")
+	fmt.Fprintf(fd, "       Recommended: \"[%%D %%T] [%%L] (%%S) %%M\"\n")
 	fmt.Fprintln(fd, "    -->")
-	fmt.Fprintln(fd, "    <property name=\"format\">[%D %T] [%L] (%S) %M</property>")
+	fmt.Fprintf(fd, "    <property name=\"format\">[%%D %%T] [%%L] (%%S) %%M</property>\n")
 	fmt.Fprintln(fd, "    <property name=\"rotate\">false</property> <!-- true enables log rotation, otherwise append -->")
 	fmt.Fprintln(fd, "    <property name=\"maxsize\">0M</property> <!-- \\d+[KMG]? Suffixes are in terms of 2**10 -->")
 	fmt.Fprintln(fd, "    <property name=\"maxlines\">0K</property> <!-- \\d+[KMG]? Suffixes are in terms of thousands -->")
@@ -479,7 +482,6 @@ func BenchmarkConsoleLog(b *testing.B) {
 	}
 	*/
 
-	stdout = ioutil.Discard
 	sl := NewDefaultLogger(INFO)
 	for i := 0; i < b.N; i++ {
 		sl.Log(WARNING, "here", "This is a log message")
@@ -510,7 +512,7 @@ func BenchmarkConsoleUtilNotLog(b *testing.B) {
 func BenchmarkFileLog(b *testing.B) {
 	sl := make(Logger)
 	b.StopTimer()
-	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false))
+	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false, false))
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		sl.Log(WARNING, "here", "This is a log message")
@@ -522,7 +524,7 @@ func BenchmarkFileLog(b *testing.B) {
 func BenchmarkFileNotLogged(b *testing.B) {
 	sl := make(Logger)
 	b.StopTimer()
-	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false))
+	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false, false))
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		sl.Log(DEBUG, "here", "This is a log message")
@@ -534,7 +536,7 @@ func BenchmarkFileNotLogged(b *testing.B) {
 func BenchmarkFileUtilLog(b *testing.B) {
 	sl := make(Logger)
 	b.StopTimer()
-	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false))
+	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false, false))
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		sl.Info("%s is a log message", "This")
@@ -546,7 +548,7 @@ func BenchmarkFileUtilLog(b *testing.B) {
 func BenchmarkFileUtilNotLog(b *testing.B) {
 	sl := make(Logger)
 	b.StopTimer()
-	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false))
+	sl.AddFilter("file", INFO, NewFileLogWriter("benchlog.log", false, false))
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		sl.Debug("%s is a log message", "This")
