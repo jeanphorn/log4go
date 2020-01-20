@@ -75,7 +75,7 @@ func NewFileLogWriter(fname string, rotate bool, daily bool) *FileLogWriter {
 		sanitize:  false, // set to false so as not to break compatibility
 	}
 	// open the file for the first time
-	if err := w.intRotate(); err != nil {
+	if err := w.open(); err != nil {
 		fmt.Fprintf(os.Stderr, "FileLogWriter(%q): %s\n", w.filename, err)
 		return nil
 	}
@@ -192,6 +192,10 @@ func (w *FileLogWriter) intRotate() error {
 		}
 	}
 
+	return w.open()
+}
+
+func (w *FileLogWriter) open() error {
 	// Open the log file
 	fd, err := os.OpenFile(w.filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0660)
 	if err != nil {
@@ -206,9 +210,20 @@ func (w *FileLogWriter) intRotate() error {
 	w.daily_opendate = now.Day()
 
 	// initialize rotation values
+	// TODO: determine the initial lines
 	w.maxlines_curlines = 0
-	w.maxsize_cursize = 0
+	if err = w.initFileSize(); err != nil {
+		return err
+	}
+	return nil
+}
 
+func (w *FileLogWriter) initFileSize() error {
+	stat, err := w.file.Stat()
+	if err != nil {
+		return err
+	}
+	w.maxsize_cursize = int(stat.Size())
 	return nil
 }
 
