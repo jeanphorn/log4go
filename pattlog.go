@@ -17,7 +17,7 @@ const (
 )
 
 type formatCacheType struct {
-	LastUpdateMicros    int64
+	LastUpdateMicros     int64
 	shortTime, shortDate string
 	longTime, longDate   string
 }
@@ -49,13 +49,13 @@ func FormatLogRecord(format string, rec *LogRecord) string {
 	if cache.LastUpdateMicros != micro {
 		month, day, year := rec.Created.Month(), rec.Created.Day(), rec.Created.Year()
 		hour, minute, second := rec.Created.Hour(), rec.Created.Minute(), rec.Created.Second()
-		zone, _ := rec.Created.Zone()
+		// zone, _ := rec.Created.Zone()
 		updated := &formatCacheType{
 			LastUpdateMicros: micro,
-			shortTime:         fmt.Sprintf("%02d:%02d", hour, minute),
-			shortDate:         fmt.Sprintf("%02d/%02d/%02d", day, month, year%100),
-			longTime:          fmt.Sprintf("%02d:%02d:%02d.%06d %s", hour, minute, second, micro%1e6, zone),
-			longDate:          fmt.Sprintf("%04d/%02d/%02d", year, month, day),
+			shortTime:        fmt.Sprintf("%02d:%02d", hour, minute),
+			shortDate:        fmt.Sprintf("%02d/%02d/%02d", day, month, year%100),
+			longTime:         fmt.Sprintf("%02d:%02d:%02d.%06d", hour, minute, second, micro%1e6),
+			longDate:         fmt.Sprintf("%04d/%02d/%02d", year, month, day),
 		}
 		cache = *updated
 		formatCache = updated

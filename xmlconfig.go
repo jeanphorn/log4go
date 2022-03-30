@@ -183,6 +183,7 @@ func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*Fi
 	daily := false
 	rotate := false
 	sanitize := false
+	maxbackup := 0
 
 	// Parse properties
 	for _, prop := range props {
@@ -195,6 +196,8 @@ func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*Fi
 			maxlines = strToNumSuffix(strings.Trim(prop.Value, " \r\n"), 1000)
 		case "maxsize":
 			maxsize = strToNumSuffix(strings.Trim(prop.Value, " \r\n"), 1024)
+		case "maxbackup":
+			maxbackup = strToNumSuffix(strings.Trim(prop.Value, " \r\n"), 1)
 		case "daily":
 			daily = strings.Trim(prop.Value, " \r\n") != "false"
 		case "rotate":
@@ -217,7 +220,7 @@ func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*Fi
 		return nil, true
 	}
 
-	flw := NewFileLogWriter(file, rotate, daily)
+	flw := NewFileLogWriter(file, rotate, daily, maxbackup)
 	flw.SetFormat(format)
 	flw.SetRotateLines(maxlines)
 	flw.SetRotateSize(maxsize)
