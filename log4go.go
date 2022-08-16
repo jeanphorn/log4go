@@ -216,18 +216,20 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 		msg = fmt.Sprintf(format, args...)
 	}
 
-	// Make the log record
-	rec := &LogRecord{
-		Level:   lvl,
-		Created: time.Now(),
-		Source:  src,
-		Message: msg,
-	}
+	now := time.Now()
 
 	// Dispatch the logs
 	for _, filt := range log {
 		if lvl < filt.Level {
 			continue
+		}
+		// Make the log record
+		rec := &LogRecord{
+			Level:    lvl,
+			Created:  now,
+			Source:   src,
+			Message:  msg,
+			Category: filt.Category,
 		}
 		filt.LogWrite(rec)
 	}
@@ -254,19 +256,20 @@ func (log Logger) intLogc(lvl Level, closure func() string) {
 	if ok {
 		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
 	}
-
-	// Make the log record
-	rec := &LogRecord{
-		Level:   lvl,
-		Created: time.Now(),
-		Source:  src,
-		Message: closure(),
-	}
+	now := time.Now()
 
 	// Dispatch the logs
 	for _, filt := range log {
 		if lvl < filt.Level {
 			continue
+		}
+		// Make the log record
+		rec := &LogRecord{
+			Level:    lvl,
+			Created:  now,
+			Source:   src,
+			Category: filt.Category,
+			Message:  closure(),
 		}
 		filt.LogWrite(rec)
 	}
@@ -287,18 +290,20 @@ func (log Logger) Log(lvl Level, source, message string) {
 		return
 	}
 
-	// Make the log record
-	rec := &LogRecord{
-		Level:   lvl,
-		Created: time.Now(),
-		Source:  source,
-		Message: message,
-	}
+	now := time.Now()
 
 	// Dispatch the logs
 	for _, filt := range log {
 		if lvl < filt.Level {
 			continue
+		}
+		// Make the log record
+		rec := &LogRecord{
+			Level:    lvl,
+			Created:  now,
+			Source:   source,
+			Message:  message,
+			Category: filt.Category,
 		}
 		filt.LogWrite(rec)
 	}

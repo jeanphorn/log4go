@@ -5,8 +5,8 @@ package log4go
 import (
 	"fmt"
 	"os"
-	"time"
 	"strings"
+	"time"
 )
 
 // This log writer sends output to a file
@@ -41,7 +41,7 @@ type FileLogWriter struct {
 	maxbackup int
 
 	// Sanitize newlines to prevent log injection
-	sanitize	bool
+	sanitize bool
 }
 
 // This is the FileLogWriter's output method
@@ -52,6 +52,7 @@ func (w *FileLogWriter) LogWrite(rec *LogRecord) {
 func (w *FileLogWriter) Close() {
 	close(w.rec)
 	w.file.Sync()
+	w.file.Close()
 }
 
 // NewFileLogWriter creates a new LogWriter which writes to the given file and
@@ -169,7 +170,7 @@ func (w *FileLogWriter) intRotate() error {
 				// Rename the file to its newfound home
 				err = os.Rename(w.filename, fname)
 				if err != nil {
-					return fmt.Errorf("Rotate: %s\n", err)
+					return fmt.Errorf("Rotate: %s", err)
 				}
 			} else if !w.daily {
 				num = w.maxbackup - 1
@@ -186,7 +187,7 @@ func (w *FileLogWriter) intRotate() error {
 				err = os.Rename(w.filename, fname)
 				// return error if the last file checked still existed
 				if err != nil {
-					return fmt.Errorf("Rotate: %s\n", err)
+					return fmt.Errorf("Rotate: %s", err)
 				}
 			}
 

@@ -41,13 +41,13 @@ func NewSocketLogWriter(proto, hostport string) SocketLogWriter {
 			// Marshall into JSON
 			js, err := json.Marshal(rec)
 			if err != nil {
-				fmt.Fprint(os.Stderr, "SocketLogWriter(%q): %s", hostport, err)
+				fmt.Fprintf(os.Stderr, "SocketLogWriter(%q): %s", hostport, err)
 				return
 			}
 
 			_, err = sock.Write(js)
 			if err != nil {
-				fmt.Fprint(os.Stderr, "SocketLogWriter(%q): %s", hostport, err)
+				fmt.Fprintf(os.Stderr, "SocketLogWriter(%q): %s", hostport, err)
 				return
 			}
 		}

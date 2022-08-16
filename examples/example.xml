@@ -1,3 +1,4 @@
+
 <logging>
   <filter enabled="true">
     <tag>stdout</tag>

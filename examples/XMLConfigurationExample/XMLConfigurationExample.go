@@ -1,7 +1,7 @@
 package main
 
 import (
-	l4g "github.com/jeanphorn/log4go"
+	l4g "github.com/wvkehoe/log4go"
 )
 
 func main() {

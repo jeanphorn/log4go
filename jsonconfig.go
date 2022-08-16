@@ -76,7 +76,7 @@ func (log Logger) LoadJsonConfiguration(filename string) {
 			os.Exit(1)
 		}
 	} else {
-		content = string(dst.Bytes())
+		content = dst.String()
 	}
 
 	err = json.Unmarshal([]byte(content), &lc)
