@@ -50,7 +50,7 @@ func FormatLogRecord(format string, rec *LogRecord) string {
 	if cache.LastUpdateSeconds != secs {
 		month, day, year := rec.Created.Month(), rec.Created.Day(), rec.Created.Year()
 		hour, minute, second := rec.Created.Hour(), rec.Created.Minute(), rec.Created.Second()
-		millisecond := rec.Created.UnixMicro()
+		millisecond := rec.Created.UnixMicro() % 1e6
 		zone, _ := rec.Created.Zone()
 		updated := &formatCacheType{
 			LastUpdateSeconds: secs,
