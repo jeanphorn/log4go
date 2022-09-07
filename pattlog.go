@@ -181,8 +181,7 @@ func (w FormatLogWriter) Close() {
 
 func changeDttmFormat(format string, rec *LogRecord) []byte {
 	formatByte := []byte(format)
-	pat := `%D{(.*?)}`
-	r := regexp.MustCompile(pat)
+	r := regexp.MustCompile("\\%D\\{(.*?)\\}")
 	i := 0
 	formatByte = r.ReplaceAllFunc(formatByte, func(s []byte) []byte {
 		if i < 2 {
