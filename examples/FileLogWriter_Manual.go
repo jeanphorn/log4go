@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-import l4g "code.google.com/p/log4go"
+import l4g "github.com/netluo/log4go"
 
 const (
 	filename = "flw.log"
