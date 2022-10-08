@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	FORMAT_DEFAULT = "[%Y-%m-%d %H:%M:%S.%c] [%L] (%A) %I"
+	FORMAT_DEFAULT = "[%Y-%m-%d %H:%M:%S.%o] [%L] (%A) %I"
 	FORMAT_SHORT   = "[%m-%d %H:%M:%S] [%L] %I"
 	FORMAT_ABBREV  = "[%L] %I"
 )
